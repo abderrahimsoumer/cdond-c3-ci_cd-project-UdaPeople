@@ -134,7 +134,7 @@ jobs:
           command: |
             PUBLIC_DNS=$(aws --region "${AWS_DEFAULT_REGION}" ec2 describe-instances \
               --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --query "Reservations[*].Instances[*].PublicDnsName \
+              --query "Reservations[*].Instances[*].PublicDnsName" \
               -- output text ) 
             echo $PUBLIC_DNS >> .circleci/ansible/inventory.txt
             cat .circleci/ansible/inventory.txt

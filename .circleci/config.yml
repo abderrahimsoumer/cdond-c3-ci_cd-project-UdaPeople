@@ -178,6 +178,7 @@ jobs:
       - run:
           name: Run migrations
           command: |
+            sudo apt-get update && sudo apt-get install -y ca-certificates
             cd backend
             npm install
             # Run and save the migration output

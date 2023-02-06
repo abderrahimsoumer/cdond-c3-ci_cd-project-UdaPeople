@@ -33,7 +33,6 @@ commands:
               npm install
               npm run migrations:revert
             fi
-
 jobs:
   build-frontend:
     docker:
@@ -256,7 +255,11 @@ jobs:
           name: Install dependencies
           command: |
             pip install ansible
-            sudo apt update nodejs npm tar gzip
+            sudo apt-get install nodejs
+            sudo apt-get install npm
+            sudo apt-get install tar
+            sudo apt-get install gzip
+            sudo apt update
             pip install awscli
       - run:
           name: Deploy backend
@@ -275,6 +278,44 @@ jobs:
           Workflow_ID: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations:
           Workflow_ID: ${CIRCLE_WORKFLOW_ID:0:7}
+  smoke-test:
+    docker:
+      - image: python:3.7-alpine3.11 
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update curl
+            pip install awscli
+      - run:
+          name: Backend smoke test.
+          command: |
+            BACKEND_IP=$(aws --region us-west-2 ec2 describe-instances \
+              --filters "Name=tag:Name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --query 'Reservations[*].Instances[*].PublicDnsName' --output text)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "${API_URL}"
+            if curl "${API_URL}/api/status" | grep "ok"
+            then
+                return 0
+            else
+                return 1
+            fi
+      - run:
+          name: Frontend smoke test.
+          command: |
+            URL="http://udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"             
+            echo ${URL} 
+            if curl -s ${URL} | grep "Welcome"
+            then
+                # Change this to 0 after the job fails
+              return 1
+            else
+              return 1
+            fi 
 workflows:
   default:
     jobs:
@@ -301,3 +342,5 @@ workflows:
           requires: [run-migrations]
       - deploy-backend:
           requires: [run-migrations]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]

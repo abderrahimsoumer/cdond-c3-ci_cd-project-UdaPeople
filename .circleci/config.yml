@@ -17,6 +17,21 @@ commands:
             aws cloudformation delete-stack \
               --stack-name udapeople-frontend-<<parameters.Workflow_ID>>
             aws s3 rm s3://udapeople-<<parameters.Workflow_ID>> --recursive
+  revert-migrations:
+    parameters:
+      Workflow_ID:
+        type: string
+    steps:
+      - run:
+          name: Reverting migrations
+          when: on_fail
+          command: |
+            SUCCESS=$(curl "https://kvdb.io/D572beRHLqhJd7TTSBukEG//migration_<<parameters.workflow_id>>" -H "X-Api-Key: ${THISDB_API_KEY}")
+            if (($SUCCESS == 1)); then
+              cd backend
+              npm install
+              npm run migrations:revert
+            fi
 
 jobs:
   build-frontend:
@@ -187,9 +202,9 @@ jobs:
           command: |
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
-              curl https://kvdb.io/SfFzMtenh3SQd82QoR7F/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+              curl https://kvdb.io/D572beRHLqhJd7TTSBukEG/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             else
-              curl https://kvdb.io/SfFzMtenh3SQd82QoR7F/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '0'
+              curl https://kvdb.io/D572beRHLqhJd7TTSBukEG/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '0'
             fi
       - destroy-environment:
           Workflow_ID: ${CIRCLE_WORKFLOW_ID:0:7}
@@ -224,6 +239,8 @@ jobs:
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 workflows:
   default:

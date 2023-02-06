@@ -264,20 +264,7 @@ jobs:
       - run:
           name: Deploy backend
           command: |
-            cd backend
-            export ANSIBLE_HOST_KEY_CHECKING=False
-            export RECORD_HOST_KEYS=False
-            export ANSIBLE_PARAMIKO_BANNER_TIMEOUT=30   
-            echo ENVIROMENT=production > ".env"      
-            echo TYPEORM_CONNECTION=postgres >> ".env"
-            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> ".env"
-            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> ".env"          
-            echo TYPEORM_PORT=$TYPEORM_PORT >> ".env"      
-            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> ".env"            
-            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> ".env"      
-            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> ".env"     
-            echo "CONTENT OF .env"      
-            cat .env  
+            cd backend  
             npm i
             npm run build
             cd ..

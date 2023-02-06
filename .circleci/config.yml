@@ -263,10 +263,15 @@ jobs:
           fingerprints: ["59:9e:d3:7b:e6:6e:6e:f5:85:f4:15:27:8e:f2:5d:9a"]
       - attach_workspace:
           at: ~/
+      - restore_cache:
+          keys:
+            - build-backend
       - run:
           name: Install dependencies
           command: |
-            apk add --update aws-cli curl ansible nodejs npm tar gzip
+            apk add curl
+            apk add --update ansible nodejs npm tar gzip
+            pip3 install awscli
       - run:
           name: Deploy backend
           command: |

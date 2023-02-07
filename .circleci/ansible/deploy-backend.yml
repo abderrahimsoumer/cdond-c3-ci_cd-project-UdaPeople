@@ -14,10 +14,6 @@
       wait_for_connection:
         delay: 60
         timeout: 600
-    - name: 'Wait port 3030 to become reachable/usable.'
-      wait_for:
-        port: 3030
-        delay: 10
   environment:
     - TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION')}}"  
     - TYPEORM_ENTITIES: "{{ lookup('env', 'TYPEORM_ENTITIES')}}"

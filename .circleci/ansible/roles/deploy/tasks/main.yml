@@ -31,6 +31,22 @@
       npm install
       pm2 stop default
       pm2 start npm --name "Backend app" -- start
+  register: execute_node
+- name: Check if port 80 is listening
+  wait_for:
+    port: 80
+    delay: 5
+    timeout: 10
+    msg: "Timeout waiting for 80 to respond"
+  register: port_check
+  ignore_errors: yes
+- name: print message
+  debug:
+    msg: "{{ execute_node.stdout_lines }} ---- {{ port_check.stdout_lines }}"
+- name: "Configure pm2 to start as service"
+  become: true
+  shell: |
+    env PATH=$PATH:/usr/local/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
   environment:
     ENVIRONMENT: production
     TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"

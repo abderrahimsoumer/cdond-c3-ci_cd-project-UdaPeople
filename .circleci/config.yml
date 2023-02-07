@@ -348,7 +348,7 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-       - run:
+      - run:
           name: Save Old Workflow ID to kvdb.io
           command: |
             export OldWorkflowID=$(aws --region us-west-2 cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text)

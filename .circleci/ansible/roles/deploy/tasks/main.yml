@@ -34,15 +34,15 @@
   register: execute_node
 - name: Check if port 80 is listening
   wait_for:
-    port: 80
+    port: 3030
     delay: 5
     timeout: 10
-    msg: "Timeout waiting for 80 to respond"
+    msg: "Timeout waiting for 3030 to respond"
   register: port_check
   ignore_errors: yes
 - name: print message
   debug:
-    msg: "{{ execute_node.stdout_lines }} ---- {{ port_check.stdout_lines }}"
+    msg: "{{ execute_node.stdout_lines }}"
 - name: "Configure pm2 to start as service"
   become: true
   shell: |

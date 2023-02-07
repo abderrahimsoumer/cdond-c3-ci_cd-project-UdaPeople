@@ -32,7 +32,7 @@
       pm2 stop default
       pm2 start npm --name "Backend app" -- start
   register: execute_node
-- name: Check if port 80 is listening
+- name: Check if port 3030 is listening
   wait_for:
     port: 3030
     delay: 5

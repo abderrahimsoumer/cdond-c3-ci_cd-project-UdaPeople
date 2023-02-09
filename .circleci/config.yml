@@ -366,12 +366,17 @@ jobs:
             export OldWorkflowID=$(curl --insecure https://kvdb.io/D572beRHLqhJd7TTSBukEG/workflow_id)
             echo OldWorkflowID: "${OldWorkflowID}"
             echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
-            echo $OldWorkflowID >>  oldWorkflowID.txt
+            echo $OldWorkflowID >>  ~/project/oldWorkflowID.txt
+            cat ~/project/oldWorkflowID.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/oldWorkflowID.txt
       - run:
           name: Remove old stacks and files
           command: |
-            cat ~/oldWorkflowID.txt
-            OldWorkflowID = $(cat ~/oldWorkflowID.txt)
+            cat ~/project/oldWorkflowID.txt
+            OldWorkflowID = $(cat ~/project/oldWorkflowID.txt)
             echo "workflowID to delete : ${OldWorkflowID}"
             # Fetch the stack names          
             export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
